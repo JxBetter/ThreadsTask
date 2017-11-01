@@ -1,0 +1,56 @@
+import urllib.request
+import urllib.error
+import threading
+import re
+import time
+
+pat = '<div class="content">.*?<span>(.*?)</span>.*?</div>'
+head = ('user-agent','Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.104 Safari/537.36 Core/1.53.2372.400 QQBrowser/9.5.10771.400')
+opener = urllib.request.build_opener()
+opener.addheaders=[head]
+urllib.request.install_opener(opener)
+
+class A(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+    def run(self):
+        try:
+            for i in range(1,40,2):
+                file1 = r'E:\python\html\糗事百科\奇数.txt'
+                url = 'https://www.qiushibaike.com/8hr/page/' + str(i)
+                data = urllib.request.urlopen(url).read().decode()
+                redata = re.compile(pat, re.S).findall(data)
+                for j in range(0, len(redata)):
+                    a = redata[j]
+                    print(a)
+                    fp = open(file1,'a',encoding='utf-8')
+                    fp.write(a+'\n')
+                    fp.close()
+                    time.sleep(1)
+        except urllib.error.URLError as e:
+            if hasattr(e,'code') and hasattr(e,'reason'):
+                print(e)
+
+class B(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+    def run(self):
+        try:
+            for i in range(2,40,2):
+                file2 = r'E:\python\html\糗事百科\偶数.txt'
+                url = 'https://www.qiushibaike.com/8hr/page/' + str(i)
+                data = urllib.request.urlopen(url).read().decode()
+                redata = re.compile(pat, re.S).findall(data)
+                for j in range(0, len(redata)):
+                    a = redata[j]
+                    fp = open(file2,'a',encoding='utf-8')
+                    fp.write(a + '\n')
+                    fp.close()
+                    time.sleep(1)
+        except urllib.error.URLError as e:
+            if hasattr(e,'code') and hasattr(e,'reason'):
+                print(e)
+t1 = A()
+t1.start()
+t2 = B()
+t2.start()
